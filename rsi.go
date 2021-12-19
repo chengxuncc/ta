@@ -1,8 +1,6 @@
 package ta
 
 import (
-	"math"
-
 	"github.com/shopspring/decimal"
 )
 
@@ -26,76 +24,53 @@ import (
 //  https://www.investopedia.com/terms/r/rsi.asp
 //  https://www.fidelity.com/learning-center/trading-investing/technical-analysis/technical-indicator-guide/RSI
 
-func NewRelativeStrengthIndex(window int) *RelativeStrengthIndex {
+var oneHundred = decimal.NewFromInt(100)
+
+func NewRSI(window int) *RelativeStrengthIndex {
 	return &RelativeStrengthIndex{
-		relativeStrength: NewRelativeStrength(window),
-		oneHundred:       decimal.NewFromInt(100),
+		window:      window,
+		AverageGain: Indicators{NewGain(), NewEMAWithSmoothing(window, One)},
+		AverageLoss: Indicators{NewLoss(), NewEMAWithSmoothing(window, One)},
 	}
 }
 
 var _ Indicator = (*RelativeStrengthIndex)(nil)
 
 type RelativeStrengthIndex struct {
-	relativeStrength Indicator
-	oneHundred       decimal.Decimal
-}
-
-func (r *RelativeStrengthIndex) WindowSize() int {
-	return r.relativeStrength.WindowSize()
-}
-
-func (r *RelativeStrengthIndex) Update(value decimal.Decimal) decimal.Decimal {
-	relativeStrength := r.relativeStrength.Update(value)
-	return r.oneHundred.Sub(r.oneHundred.Div(One.Add(relativeStrength)))
-}
-
-func (r *RelativeStrengthIndex) DryUpdate(value decimal.Decimal) decimal.Decimal {
-	relativeStrength := r.relativeStrength.DryUpdate(value)
-	return r.oneHundred.Sub(r.oneHundred.Div(One.Add(relativeStrength)))
-}
-
-func NewRelativeStrength(window int) *RelativeStrength {
-	return &RelativeStrength{
-		window:      window,
-		AverageGain: Indicators{NewGain(), NewExponentialMovingAverage(window)},
-		AverageLoss: Indicators{NewLoss(), NewExponentialMovingAverage(window)},
-	}
-}
-
-var _ Indicator = (*RelativeStrength)(nil)
-
-type RelativeStrength struct {
 	window      int
 	AverageGain Indicator
 	AverageLoss Indicator
 	count       int
 }
 
-func (r *RelativeStrength) WindowSize() int {
+func (r *RelativeStrengthIndex) WindowSize() int {
 	return r.window
 }
 
-func (r *RelativeStrength) Update(value decimal.Decimal) decimal.Decimal {
+func (r *RelativeStrengthIndex) Update(value decimal.Decimal) decimal.Decimal {
 	r.count++
 	averageGain := r.AverageGain.Update(value)
 	averageLoss := r.AverageLoss.Update(value)
 	if r.count <= r.window {
-		return decimal.Zero
+		return Zero
 	}
-	if averageLoss.IsZero() {
-		return decimal.NewFromFloat(math.Inf(1))
+	sum := averageGain.Add(averageLoss)
+	if sum.IsZero() {
+		return Zero
 	}
-	return averageGain.Div(averageLoss)
+	return averageGain.Div(sum).Mul(oneHundred)
 }
 
-func (r *RelativeStrength) DryUpdate(value decimal.Decimal) decimal.Decimal {
+func (r *RelativeStrengthIndex) DryUpdate(value decimal.Decimal) decimal.Decimal {
+	r.count++
 	averageGain := r.AverageGain.DryUpdate(value)
 	averageLoss := r.AverageLoss.DryUpdate(value)
 	if r.count <= r.window {
-		return decimal.Zero
+		return Zero
 	}
-	if averageLoss.IsZero() {
-		return decimal.NewFromFloat(math.Inf(1))
+	sum := averageGain.Add(averageLoss)
+	if sum.IsZero() {
+		return Zero
 	}
-	return averageGain.Div(averageLoss)
+	return averageGain.Div(sum).Mul(oneHundred)
 }

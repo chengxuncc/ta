@@ -13,7 +13,7 @@ var (
 func NewDecimal(value string) decimal.Decimal {
 	d, err := decimal.NewFromString(value)
 	if err != nil {
-		return decimal.Zero
+		return Zero
 	}
 	return d
 }
@@ -55,11 +55,11 @@ func BatchUpdate(indicator Indicator, values []decimal.Decimal) []decimal.Decima
 	return result
 }
 
-func Float64sToDecimals(values []float64) []decimal.Decimal {
+func BatchUpdateFloat64(indicator Indicator, values []float64) []float64 {
 	valuesLen := len(values)
-	result := make([]decimal.Decimal, valuesLen)
+	result := make([]float64, valuesLen)
 	for i := 0; i < valuesLen; i++ {
-		result[i] = decimal.NewFromFloat(values[i])
+		result[i] = indicator.Update(decimal.NewFromFloat(values[i])).InexactFloat64()
 	}
 	return result
 }

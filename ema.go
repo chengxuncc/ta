@@ -14,12 +14,16 @@ import (
 // days of data to calculate a reasonably accurate 10-day EMA.
 //  https://school.stockcharts.com/doku.php?id=technical_indicators:moving_averages
 
-func NewExponentialMovingAverage(window int) *ExponentialMovingAverage {
-	k1 := decimal.NewFromInt(2).Div(decimal.NewFromInt(int64(window + 1)))
+func NewEMA(window int) *ExponentialMovingAverage {
+	return NewEMAWithSmoothing(window, decimal.NewFromInt(2))
+}
+
+func NewEMAWithSmoothing(window int, smoothing decimal.Decimal) *ExponentialMovingAverage {
+	k1 := smoothing.Div(decimal.NewFromInt(int64(window + 1)))
 	k2 := One.Sub(k1)
 	return &ExponentialMovingAverage{
 		window: window,
-		sma:    NewSimpleMovingAverage(window),
+		sma:    NewSMA(window),
 		k1:     k1,
 		k2:     k2,
 	}

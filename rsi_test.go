@@ -5,6 +5,5 @@ import (
 )
 
 func TestRsi(t *testing.T) {
-	rsi := NewRelativeStrengthIndex(10)
-	compare(t, "result = talib.RSI(testClose, 10)", BatchUpdate(rsi, Float64sToDecimals(testClose)))
+	compare(t, "result = talib.RSI(testClose, 10)", BatchUpdateFloat64(NewRSI(10), testClose))
 }

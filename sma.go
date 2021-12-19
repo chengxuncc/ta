@@ -15,7 +15,7 @@ import (
 //  https://www.investopedia.com/terms/s/sma.asp
 //  https://www.fidelity.com/learning-center/trading-investing/technical-analysis/technical-indicator-guide/sma
 
-func NewSimpleMovingAverage(window int) *SimpleMovingAverage {
+func NewSMA(window int) *SimpleMovingAverage {
 	return &SimpleMovingAverage{
 		window:        window,
 		windowDecimal: decimal.NewFromInt(int64(window)),
@@ -41,7 +41,7 @@ func (s *SimpleMovingAverage) Update(value decimal.Decimal) decimal.Decimal {
 	old := s.history.Update(value)
 	s.sum = s.sum.Add(value.Sub(old))
 	if s.history.count < s.window {
-		return decimal.Zero
+		return Zero
 	}
 	return s.sum.Div(s.windowDecimal)
 }
@@ -50,7 +50,7 @@ func (s *SimpleMovingAverage) DryUpdate(value decimal.Decimal) decimal.Decimal {
 	old := s.history.DryUpdate(value)
 	sum := s.sum.Add(value.Sub(old))
 	if s.history.count < s.window {
-		return decimal.Zero
+		return Zero
 	}
 	return sum.Div(s.windowDecimal)
 }
