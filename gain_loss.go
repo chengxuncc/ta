@@ -27,10 +27,6 @@ type GainLoss struct {
 	firstOne    bool
 }
 
-func (g *GainLoss) WindowSize() int {
-	return 0
-}
-
 func (g *GainLoss) Update(value decimal.Decimal) decimal.Decimal {
 	if g.firstOne {
 		g.lastValue = value

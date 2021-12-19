@@ -15,17 +15,15 @@ import (
 //  https://school.stockcharts.com/doku.php?id=technical_indicators:moving_averages
 
 func NewEMA(window int) *ExponentialMovingAverage {
-	return NewEMAWithSmoothing(window, decimal.NewFromInt(2))
+	return NewEMAWithK(window, decimal.NewFromInt(2).Div(decimal.NewFromInt(int64(window+1))))
 }
 
-func NewEMAWithSmoothing(window int, smoothing decimal.Decimal) *ExponentialMovingAverage {
-	k1 := smoothing.Div(decimal.NewFromInt(int64(window + 1)))
-	k2 := One.Sub(k1)
+func NewEMAWithK(window int, k decimal.Decimal) *ExponentialMovingAverage {
 	return &ExponentialMovingAverage{
 		window: window,
 		sma:    NewSMA(window),
-		k1:     k1,
-		k2:     k2,
+		k1:     k,
+		k2:     One.Sub(k),
 	}
 }
 

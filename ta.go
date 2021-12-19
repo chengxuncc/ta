@@ -19,7 +19,6 @@ func NewDecimal(value string) decimal.Decimal {
 }
 
 type Indicator interface {
-	WindowSize() int
 	Update(value decimal.Decimal) decimal.Decimal
 	DryUpdate(value decimal.Decimal) decimal.Decimal
 }
@@ -27,10 +26,6 @@ type Indicator interface {
 var _ Indicator = (Indicators)(nil)
 
 type Indicators []Indicator
-
-func (i Indicators) WindowSize() int {
-	return 0
-}
 
 func (i Indicators) Update(value decimal.Decimal) decimal.Decimal {
 	for _, indicator := range i {

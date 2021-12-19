@@ -29,8 +29,8 @@ var oneHundred = decimal.NewFromInt(100)
 func NewRSI(window int) *RelativeStrengthIndex {
 	return &RelativeStrengthIndex{
 		window:      window,
-		AverageGain: Indicators{NewGain(), NewEMAWithSmoothing(window, One)},
-		AverageLoss: Indicators{NewLoss(), NewEMAWithSmoothing(window, One)},
+		AverageGain: Indicators{NewGain(), NewEMAWithK(window, One.Div(decimal.NewFromInt(int64(window))))},
+		AverageLoss: Indicators{NewLoss(), NewEMAWithK(window, One.Div(decimal.NewFromInt(int64(window))))},
 	}
 }
 
