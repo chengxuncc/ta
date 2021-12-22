@@ -1,8 +1,9 @@
-module ta
+module github.com/chengxuncc/ta
 
 go 1.17
 
 require (
+	github.com/rs/zerolog v1.26.1
 	github.com/shopspring/decimal v1.3.1
 	github.com/stretchr/testify v1.7.0
 )

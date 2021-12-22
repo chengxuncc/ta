@@ -1,6 +1,7 @@
 package ta
 
 import (
+	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 )
 
@@ -10,10 +11,11 @@ var (
 	NegOne = decimal.NewFromInt(-1)
 )
 
-func NewDecimal(value string) decimal.Decimal {
-	d, err := decimal.NewFromString(value)
+func Decimal(s string) decimal.Decimal {
+	d, err := decimal.NewFromString(s)
 	if err != nil {
-		return Zero
+		log.Warn().Str("s", s).Msg("Decimal")
+		return decimal.Zero
 	}
 	return d
 }
