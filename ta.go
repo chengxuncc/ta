@@ -1,6 +1,8 @@
 package ta
 
 import (
+	"strconv"
+
 	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 )
@@ -10,15 +12,6 @@ var (
 	One    = decimal.NewFromInt(1)
 	NegOne = decimal.NewFromInt(-1)
 )
-
-func Decimal(s string) decimal.Decimal {
-	d, err := decimal.NewFromString(s)
-	if err != nil {
-		log.Warn().Str("s", s).Msg("Decimal")
-		return decimal.Zero
-	}
-	return d
-}
 
 type Indicator interface {
 	Update(value decimal.Decimal) decimal.Decimal
@@ -59,4 +52,22 @@ func BatchUpdateFloat64(indicator Indicator, values []float64) []float64 {
 		result[i] = indicator.Update(decimal.NewFromFloat(values[i])).InexactFloat64()
 	}
 	return result
+}
+
+func Decimal(s string) decimal.Decimal {
+	d, err := decimal.NewFromString(s)
+	if err != nil {
+		log.Warn().Str("s", s).Msg("ta.Decimal")
+		return decimal.Zero
+	}
+	return d
+}
+
+func Float64(s string) float64 {
+	f, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		log.Warn().Str("s", s).Msg("ta.Float64")
+		return 0
+	}
+	return f
 }
