@@ -9,14 +9,15 @@ import (
 // TimeSeries represents an array of candles
 type TimeSeries struct {
 	Candles []*Candle
+	Limit   int
 }
 
 // NewTimeSeries returns a new, empty, TimeSeries
-func NewTimeSeries() (t *TimeSeries) {
-	t = new(TimeSeries)
-	t.Candles = make([]*Candle, 0)
-
-	return t
+func NewTimeSeries(limit int) (t *TimeSeries) {
+	return &TimeSeries{
+		Candles: make([]*Candle, limit),
+		Limit:   limit,
+	}
 }
 
 // AddCandle adds the given candle to this TimeSeries if it is not nil and after the last candle in this timeseries.
@@ -25,12 +26,15 @@ func (ts *TimeSeries) AddCandle(candle *Candle) bool {
 	if candle == nil {
 		return false
 	}
-
-	if ts.LastCandle() == nil || candle.Period.End.After(ts.LastCandle().Period.End) {
-		ts.Candles = append(ts.Candles, candle)
-		return true
+	if ts.LastCandle() != nil && !candle.Period.End.After(ts.LastCandle().Period.End) {
+		return false
 	}
 
+	if ts.Limit > 0 && len(ts.Candles) == ts.Limit {
+		ts.Candles = append(ts.Candles[1:], candle)
+	} else {
+		ts.Candles = append(ts.Candles, candle)
+	}
 	return false
 }
 
@@ -38,19 +42,11 @@ func (ts *TimeSeries) AddCandleRealtime(candle *Candle) bool {
 	if candle == nil {
 		return false
 	}
-
 	now := time.Now()
 	if !(now.After(candle.Period.Start) && now.After(candle.Period.End)) {
 		return false
 	}
-	if len(ts.Candles) == 0 {
-		ts.Candles = append(ts.Candles, candle)
-		return true
-	} else if candle.Period.End.After(ts.LastCandle().Period.End) {
-		ts.Candles = append(ts.Candles[1:], candle)
-		return true
-	}
-	return false
+	return ts.AddCandle(candle)
 }
 
 // LastCandle will return the lastCandle in this series, or nil if this series is empty
