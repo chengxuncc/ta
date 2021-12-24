@@ -2,6 +2,8 @@ package ta
 
 import (
 	"time"
+
+	"github.com/shopspring/decimal"
 )
 
 // TimeSeries represents an array of candles
@@ -63,4 +65,12 @@ func (ts *TimeSeries) LastCandle() *Candle {
 // LastIndex will return the index of the last candle in this series
 func (ts *TimeSeries) LastIndex() int {
 	return len(ts.Candles) - 1
+}
+
+func (ts *TimeSeries) Calculate(indicator Indicator) decimal.Decimal {
+	var v decimal.Decimal
+	for _, candle := range ts.Candles {
+		v = indicator.Update(candle.ClosePrice)
+	}
+	return v
 }
