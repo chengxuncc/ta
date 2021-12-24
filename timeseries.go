@@ -15,7 +15,7 @@ type TimeSeries struct {
 // NewTimeSeries returns a new, empty, TimeSeries
 func NewTimeSeries(limit int) (t *TimeSeries) {
 	return &TimeSeries{
-		Candles: make([]*Candle, limit),
+		Candles: make([]*Candle, 0, limit),
 		Limit:   limit,
 	}
 }
