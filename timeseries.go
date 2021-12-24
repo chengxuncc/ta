@@ -1,7 +1,7 @@
 package ta
 
 import (
-	"fmt"
+	"time"
 )
 
 // TimeSeries represents an array of candles
@@ -21,7 +21,7 @@ func NewTimeSeries() (t *TimeSeries) {
 // If the candle is added, AddCandle will return true, otherwise it will return false.
 func (ts *TimeSeries) AddCandle(candle *Candle) bool {
 	if candle == nil {
-		panic(fmt.Errorf("error adding Candle: candle cannot be nil"))
+		return false
 	}
 
 	if ts.LastCandle() == nil || candle.Period.Since(ts.LastCandle().Period) >= 0 {
@@ -29,6 +29,25 @@ func (ts *TimeSeries) AddCandle(candle *Candle) bool {
 		return true
 	}
 
+	return false
+}
+
+func (ts *TimeSeries) AddCandleRealtime(candle *Candle) bool {
+	if candle == nil {
+		return false
+	}
+
+	now := time.Now()
+	if !(now.After(candle.Period.Start) && now.After(candle.Period.End)) {
+		return false
+	}
+	if len(ts.Candles) == 0 {
+		ts.Candles = append(ts.Candles, candle)
+		return true
+	} else if candle.Period.Since(ts.LastCandle().Period) >= 0 {
+		ts.Candles = append(ts.Candles[1:], candle)
+		return true
+	}
 	return false
 }
 
