@@ -26,7 +26,7 @@ func (ts *TimeSeries) AddCandle(candle *Candle) bool {
 		return false
 	}
 
-	if ts.LastCandle() == nil || candle.Period.Since(ts.LastCandle().Period) >= 0 {
+	if ts.LastCandle() == nil || candle.Period.End.After(ts.LastCandle().Period.End) {
 		ts.Candles = append(ts.Candles, candle)
 		return true
 	}
@@ -46,7 +46,7 @@ func (ts *TimeSeries) AddCandleRealtime(candle *Candle) bool {
 	if len(ts.Candles) == 0 {
 		ts.Candles = append(ts.Candles, candle)
 		return true
-	} else if candle.Period.Since(ts.LastCandle().Period) >= 0 {
+	} else if candle.Period.End.After(ts.LastCandle().Period.End) {
 		ts.Candles = append(ts.Candles[1:], candle)
 		return true
 	}
