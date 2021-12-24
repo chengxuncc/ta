@@ -35,7 +35,7 @@ func (ts *TimeSeries) AddCandle(candle *Candle) bool {
 	} else {
 		ts.Candles = append(ts.Candles, candle)
 	}
-	return false
+	return true
 }
 
 func (ts *TimeSeries) AddCandleRealtime(candle *Candle) bool {
